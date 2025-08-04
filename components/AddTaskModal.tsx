@@ -45,10 +45,13 @@ const AddTaskModal = () => {
 
   useEffect(() => {
     setUserList(JSON.parse(localStorage.getItem("usersList") as string));
+
+   
   }, []);
 
   const handleAddTask = async () => {
-    if (newTask) {
+     console.log("New Task",newTask)
+    if (newTask.assignee !="" && newTask.description !="" && newTask.title !="") {
       const userStr = localStorage.getItem("user"); // get current user string from localStorage
       const userObj = userStr ? JSON.parse(userStr) : null; // parse to object
       delete newTask.id;
@@ -75,6 +78,13 @@ const AddTaskModal = () => {
         setNewTask(EmptyTask);
         setIsAddModalOpen(false);
       }
+    }else {
+       toast({
+          title: "Please fill the form",
+          variant: "default",
+          className: "bg-red-400 text-black",
+          duration: 2000,
+        });
     }
   };
  
@@ -158,7 +168,7 @@ const AddTaskModal = () => {
               Assignee
             </Label>
             <Select
-              value={newTask?.assignee}
+              value={newTask?.user_id}
               onValueChange={(value) =>
                 setNewTask({ ...newTask, assignee: value as TaskStatus })
               }
