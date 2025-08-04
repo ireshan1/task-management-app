@@ -44,11 +44,12 @@ const AddTaskModal = () => {
   };
 
   useEffect(() => {
-    console.log("New Task", newTask);
     setUserList(JSON.parse(localStorage.getItem("usersList") as string));
   }, []);
 
   const handleAddTask = async () => {
+
+    
     setNewTask(EmptyTask);
     if (
       newTask.assignee != "" &&
@@ -89,6 +90,8 @@ const AddTaskModal = () => {
           }
         }
       } else {
+
+        console.log("New Task",newTask);
         delete newTask.id;
         const { data, error } = await supabase
           .from("tasks")

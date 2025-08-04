@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import EditDeleteMenu from "./EditDeleteMenu";
-import { Button } from "@/components/ui/button";
 import { useTaskStore } from "@/store/taskStore";
 import { Task, TaskPriority, TaskStatus } from "@/types/types";
 import {
@@ -137,7 +136,6 @@ const Tasklist = () => {
                     <TableHead>Description</TableHead>
                     <TableHead>Priority</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Assignee</TableHead>
                     <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -164,10 +162,6 @@ const Tasklist = () => {
 
                       <TableCell className="text-nowrap">
                         {task.status}
-                      </TableCell>
-
-                      <TableCell className="text-nowrap">
-                        {task.assignee}
                       </TableCell>
                      
                       <TableCell className="text-right" onClick={(e)=> e.stopPropagation()}>

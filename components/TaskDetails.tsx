@@ -9,7 +9,6 @@ const TaskDetails = ({ tasks }: any) => {
   const [comments, setComments] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log("Task Single",tasks);
     async function fetchCommets() {
       const { data } = await supabase
         .from("comments")
