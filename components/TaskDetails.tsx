@@ -3,6 +3,7 @@
 import { Task } from "@/types/types";
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "@/hooks/use-toast";
 
 const TaskDetails = ({ tasks }: any) => {
   const [newComment, setNewComment] = useState("");
@@ -10,12 +11,15 @@ const TaskDetails = ({ tasks }: any) => {
 
   useEffect(() => {
     async function fetchCommets() {
-      const { data } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("task_id", tasks?.id);
-      setComments(data ?? []);
-      console.log("task details **", data); // should show your data
+      try {
+        const { data } = await supabase
+          .from("comments")
+          .select("*")
+          .eq("task_id", tasks?.id);
+        setComments(data ?? []);
+      } catch (error) {
+        console.log("Error", error);
+      }
     }
     fetchCommets();
   }, []);
@@ -29,10 +33,22 @@ const TaskDetails = ({ tasks }: any) => {
       comment: newComment.trim(),
     };
 
-    await supabase.from("comments").insert(comment);
+    try {
+      await supabase.from("comments").insert(comment);
 
-    setComments((prev) => [...prev, comment]);
-    setNewComment("");
+      setComments((prev) => [...prev, comment]);
+      setNewComment("");
+    } catch (error: any) {
+      const { message } = error;
+      toast({
+        title: "Error",
+        description: message,
+        variant: "default",
+        className: "bg-red-400 text-black",
+        duration: 2000,
+      });
+      console.error(message);
+    }
   };
 
   return (
@@ -59,11 +75,6 @@ const TaskDetails = ({ tasks }: any) => {
         </div>
 
         <div>
-          <span className="text-gray-500 text-sm">Assignee</span>
-          <div className="font-medium text-gray-800">{tasks.assignee}</div>
-        </div>
-
-        <div>
           <span className="text-gray-500 text-sm">Status</span>
           <div
             className={`font-medium ${
@@ -81,7 +92,9 @@ const TaskDetails = ({ tasks }: any) => {
 
       {/* Comments */}
 
-      <h2 className="text-lg font-semibold text-gray-700 mb-2  mt-5">Add Comment</h2>
+      <h2 className="text-lg font-semibold text-gray-700 mb-2  mt-5">
+        Add Comment
+      </h2>
 
       {/* Comment Input */}
       <div className="flex items-center gap-2 mb-2">
@@ -91,14 +104,13 @@ const TaskDetails = ({ tasks }: any) => {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
-       
       </div>
-       <button
-          onClick={handleAddComment}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
-        >
-          Add
-        </button>
+      <button
+        onClick={handleAddComment}
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
+      >
+        Add
+      </button>
       {/* Comment List */}
       {comments.length > 0 && (
         <>

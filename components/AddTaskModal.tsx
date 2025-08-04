@@ -48,8 +48,6 @@ const AddTaskModal = () => {
   }, []);
 
   const handleAddTask = async () => {
-
-    
     setNewTask(EmptyTask);
     if (
       newTask.assignee != "" &&
@@ -60,65 +58,92 @@ const AddTaskModal = () => {
       const userObj = userStr ? JSON.parse(userStr) : null;
 
       if (newTask?.user_id) {
-        const { data, error } = await supabase
-          .from("tasks")
-          .update([
-            {
-              ...newTask,
-              user_id:
-                newTask.assignee != null ? newTask.assignee : userObj?.user_id,
-            },
-          ])
-          .eq("id", newTask?.id)
-          .select();
+        try {
+          const { data, error } = await supabase
+            .from("tasks")
+            .update([
+              {
+                ...newTask,
+                user_id:
+                  newTask.assignee != null
+                    ? newTask.assignee
+                    : userObj?.user_id,
+              },
+            ])
+            .eq("id", newTask?.id)
+            .select();
 
-        console.log("Task updated", data);
-        if (!error) {
+          console.log("Task updated", data);
+          if (!error) {
+            toast({
+              title: "Task has been updated",
+              variant: "default",
+              className: "bg-green-400 text-black",
+              duration: 2000,
+            });
+
+            console.log("Taks updated");
+
+            if (data && data.length > 0) {
+              updateTask(data[data.length - 1]);
+              setIsAddModalOpen(false);
+              setNewTask(EmptyTask);
+            }
+          }
+        } catch (error: any) {
+          const { message } = error;
           toast({
-            title: "Task has been updated",
+            title: "Error",
+            description: message,
             variant: "default",
-            className: "bg-green-400 text-black",
+            className: "bg-red-400 text-black",
             duration: 2000,
           });
-
-          console.log("Taks updated");
-          
-          if (data && data.length > 0) {
-            updateTask(data[data.length - 1]);
-            setIsAddModalOpen(false);
-            setNewTask(EmptyTask);
-          }
+          console.error(message);
         }
       } else {
-
-        console.log("New Task",newTask);
+        console.log("New Task", newTask);
         delete newTask.id;
-        const { data, error } = await supabase
-          .from("tasks")
-          .insert([
-            {
-              ...newTask,
-              user_id:
-                newTask.assignee != null ? newTask.assignee : userObj?.user_id,
-            },
-          ])
-          .select();
 
-        if (!error) {
+        try {
+          const { data, error } = await supabase
+            .from("tasks")
+            .insert([
+              {
+                ...newTask,
+                user_id:
+                  newTask.assignee != null
+                    ? newTask.assignee
+                    : userObj?.user_id,
+              },
+            ])
+            .select();
+
+          if (!error) {
+            toast({
+              title: "Task has been created",
+              variant: "default",
+              className: "bg-green-400 text-black",
+              duration: 2000,
+            });
+
+            if (data && data.length > 0) {
+              // Assuming the last inserted task is the one just added
+              addTask(data[data.length - 1]);
+              setIsAddModalOpen(false);
+              setNewTask(EmptyTask);
+            }
+          }
+        } catch (error: any) {
+          const { message } = error;
           toast({
-            title: "Task has been created",
+            title: "Error",
+            description: message,
             variant: "default",
-            className: "bg-green-400 text-black",
+            className: "bg-red-400 text-black",
             duration: 2000,
           });
-
-          if (data && data.length > 0) {
-            // Assuming the last inserted task is the one just added
-            console.log("Taks added");
-            addTask(data[data.length - 1]);
-            setIsAddModalOpen(false);
-            setNewTask(EmptyTask);
-          }
+          console.error(message);
         }
       }
     } else {
