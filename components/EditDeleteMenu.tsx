@@ -17,7 +17,6 @@ const EditDeleteMenu = ({ task }: { task: Task }) => {
   const { setTaskToDelete, setNewTask } = useTaskStore();
   const { setIsDeleteModalOpen, setIsAddModalOpen } = useModalStore();
 
-  console.log("Edit Task", task);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

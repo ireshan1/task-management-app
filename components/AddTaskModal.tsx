@@ -44,55 +44,106 @@ const AddTaskModal = () => {
   };
 
   useEffect(() => {
+    console.log("New Task", newTask);
     setUserList(JSON.parse(localStorage.getItem("usersList") as string));
-
-   
   }, []);
 
   const handleAddTask = async () => {
-     console.log("New Task",newTask)
-    if (newTask.assignee !="" && newTask.description !="" && newTask.title !="") {
+    setNewTask(EmptyTask);
+    if (
+      newTask.assignee != "" &&
+      newTask.description != "" &&
+      newTask.title != ""
+    ) {
       const userStr = localStorage.getItem("user"); // get current user string from localStorage
       const userObj = userStr ? JSON.parse(userStr) : null; // parse to object
-      delete newTask.id;
-      const { data, error } = await supabase
-        .from("tasks")
-        .insert([{ ...newTask, user_id: newTask.assignee != null ? newTask.assignee :userObj?.user_id}])
-        .select();
 
-      if (!error) {
-        toast({
-          title: "Task Updated",
-          variant: "default",
-          className: "bg-green-400 text-black",
-          duration: 2000,
-        });
+    
 
-        if (data && data.length > 0) {
-          // console.log("ALL  Task", data[data.length - 1]);
-          // Assuming the last inserted task is the one just added
-          //setTasks(data); // Update only the latest task
-          addTask(data[data.length - 1]);
-          // If you want to update all tasks, use a setTasks method if available
+      if (newTask?.user_id) {
+        const { data, error } = await supabase
+          .from("tasks")
+          .update([
+            {
+              ...newTask,
+              user_id:
+                newTask.assignee != null ? newTask.assignee : userObj?.user_id,
+            },
+          ])
+          .eq("id", newTask?.id).select()
+
+
+          console.log("Task updated",data)
+        if (!error) {
+          toast({
+            title: "Task has been updated",
+            variant: "default",
+            className: "bg-green-400 text-black",
+            duration: 2000,
+          });
+        
+            // Assuming the last inserted task is the one just added
+            console.log("Taks updated");
+            if (data && data.length > 0) {
+            // Assuming the last inserted task is the one just added
+            console.log("Taks added");
+            updateTask(data[data.length - 1]);
+          }
+        
+          
+          setIsAddModalOpen(false);
         }
         setNewTask(EmptyTask);
-        setIsAddModalOpen(false);
+      } else {
+        delete newTask.id;
+        const { data, error } = await supabase
+          .from("tasks")
+          .insert([
+            {
+              ...newTask,
+              user_id:
+                newTask.assignee != null ? newTask.assignee : userObj?.user_id,
+            },
+          ])
+          .select();
+
+        if (!error) {
+          toast({
+            title: "Task has been created",
+            variant: "default",
+            className: "bg-green-400 text-black",
+            duration: 2000,
+          });
+
+          // const typedData = data as Task[] | null;
+          if (data && data.length > 0) {
+            // Assuming the last inserted task is the one just added
+            console.log("Taks added");
+            addTask(data[data.length - 1]);
+          }
+          
+          setIsAddModalOpen(false);
+        }
+        setNewTask(EmptyTask);
       }
-    }else {
-       toast({
-          title: "Please fill the form",
-          variant: "default",
-          className: "bg-red-400 text-black",
-          duration: 2000,
-        });
+    } else {
+      toast({
+        title: "Please fill the form",
+        variant: "default",
+        className: "bg-red-400 text-black",
+        duration: 2000,
+      });
     }
   };
- 
+
   return (
     <Dialog open={isAddModalOpen} onOpenChange={handleAddModalClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle> {newTask?.id ? "Edit Task" : "Add New Task"}</DialogTitle>
+          <DialogTitle>
+            {" "}
+            {newTask?.id ? "Edit Task" : "Add New Task"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4 ">
@@ -168,7 +219,7 @@ const AddTaskModal = () => {
               Assignee
             </Label>
             <Select
-              value={newTask?.user_id}
+              value={newTask.id != '' || newTask.id != undefined || newTask.id != null ? newTask?.assignee : newTask?.id}
               onValueChange={(value) =>
                 setNewTask({ ...newTask, assignee: value as TaskStatus })
               }
@@ -187,10 +238,10 @@ const AddTaskModal = () => {
             </Select>
           </div>
         </div>
-       
+
         <DialogFooter>
           <Button type="submit" onClick={handleAddTask}>
-             {newTask?.id ? "Save" : "Add Task"}
+            {newTask?.id ? "Update" : "Add Task"}
           </Button>
         </DialogFooter>
       </DialogContent>
