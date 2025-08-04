@@ -9,7 +9,7 @@ export type User = {
 };
 
 export type Task = {
-  id?:string,
+  id?:any,
   title: string;
   description?: string;
   priority: TaskPriority;
@@ -17,12 +17,4 @@ export type Task = {
   assignee:string;
   user_id:string;
 };
-// export type Task = {
-//   _id: string;
-//   title: string;
-//   description?: string;
-//   status: TaskStatus;
-//   priority: TaskPriority;
-//   dueDate?: Date;
-// };
 

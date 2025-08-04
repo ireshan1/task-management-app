@@ -3,8 +3,6 @@ import { DashboardComponent } from "@/components/Dashboard";
 import DeleteModal from "@/components/DeleteModal";
 export default function Home() {
 
-
-
   return (
     <>
       <DashboardComponent />

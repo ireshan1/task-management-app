@@ -1,7 +1,6 @@
 "use client";
 
 import Header from "./Header";
-import Kanban from "./Kanban";
 import Sidebar from "./Sidebar";
 import { useEffect } from "react";
 import Tasklist from "./Tasklist";
@@ -17,19 +16,6 @@ export function DashboardComponent() {
   const router = useRouter();
 
   const fetchTasks = async () => {
-    // const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/alltasks`;
-    // const headers = {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: user?.token || "",
-    //   },
-    //   body: JSON.stringify({ user: user?.email }),
-    // };
-
-    // const res = await fetch(url, headers);
-    // const result = await res.json();
-  
       const userStr = localStorage.getItem("user"); // get current user string from localStorage
       const userObj = userStr ? JSON.parse(userStr) : null; // parse to object
     //fetch all task that were created by logged user
@@ -79,7 +65,6 @@ export function DashboardComponent() {
         <Sidebar />
         <div className="flex-1 p-8 overflow-auto ">
           <Header />
-          {/* {boardView === "list" ? <Tasklist /> : <TaskDetails />} */}
           <Tasklist />
         </div>
       </div>

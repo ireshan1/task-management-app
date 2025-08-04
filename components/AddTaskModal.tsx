@@ -45,42 +45,10 @@ const AddTaskModal = () => {
 
   useEffect(() => {
     setUserList(JSON.parse(localStorage.getItem("usersList") as string));
-
-    console.log(
-      "userList",
-      JSON.parse(localStorage.getItem("usersList") as string)
-    );
-    console.log(
-      "ggggggggggggggg",
-      userList.map((data) => data.name)
-    );
   }, []);
 
   const handleAddTask = async () => {
-    // return;
-    // if there is id present in task it will update that task
     if (newTask) {
-      // const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/updatetask`;
-      // const headers = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ ...newTask }),
-      // };
-      // const res = await fetch(url, headers);
-      // const data = await res.json();
-
-      // const obj = [
-      //   {
-      //     title: "New Task 4",
-      //     description: "desc 4",
-      //     priority: "Medium 4",
-      //   },
-      // ];
-
-      // const { data, error } = await supabase.from("task").insert(JSON.stringify(obj)).select();
-      // console.log("Data",data);
       const userStr = localStorage.getItem("user"); // get current user string from localStorage
       const userObj = userStr ? JSON.parse(userStr) : null; // parse to object
       delete newTask.id;
@@ -107,40 +75,14 @@ const AddTaskModal = () => {
         setNewTask(EmptyTask);
         setIsAddModalOpen(false);
       }
-    } else {
-      // is there is no id present in task it will add new task to the list
-      // try {
-      //   const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/addtask`;
-      //   const headers = {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${user?.token}`,
-      //     },
-      //     // body: JSON.stringify({ ...newTask, user: user?.email }),
-      //   };
-      //   const res = await fetch(url, headers);
-      //   const data = await res.json();
-      //   addTask(data.task);
-      //   toast({
-      //     title: "Task Added",
-      //     variant: "default",
-      //     className: "bg-green-400 text-black",
-      //     duration: 2000,
-      //   });
-      // } catch (error) {
-      //   console.error(error);
-      // }
-      // setNewTask(EmptyTask);
-      // setIsAddModalOpen(false);
     }
   };
-  // {newTask._id ? "Edit Task" : "Add New Task"}
+ 
   return (
     <Dialog open={isAddModalOpen} onOpenChange={handleAddModalClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{"Add New Task"}</DialogTitle>
+          <DialogTitle> {newTask?.id ? "Edit Task" : "Add New Task"}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4 ">
@@ -150,7 +92,7 @@ const AddTaskModal = () => {
             </Label>
             <Input
               id="title"
-              value={newTask.title}
+              value={newTask?.title}
               onChange={(e) =>
                 setNewTask({ ...newTask, title: e.target.value })
               }
@@ -163,7 +105,7 @@ const AddTaskModal = () => {
             </Label>
             <Textarea
               id="description"
-              value={newTask.description}
+              value={newTask?.description}
               onChange={(e) =>
                 setNewTask({ ...newTask, description: e.target.value })
               }
@@ -175,7 +117,7 @@ const AddTaskModal = () => {
               Status
             </Label>
             <Select
-              value={newTask.status}
+              value={newTask?.status}
               onValueChange={(value) =>
                 setNewTask({ ...newTask, status: value as TaskStatus })
               }
@@ -195,7 +137,7 @@ const AddTaskModal = () => {
               Priority
             </Label>
             <Select
-              value={newTask.priority}
+              value={newTask?.priority}
               onValueChange={(value) =>
                 setNewTask({ ...newTask, priority: value as TaskPriority })
               }
@@ -216,7 +158,7 @@ const AddTaskModal = () => {
               Assignee
             </Label>
             <Select
-              value={newTask.assignee}
+              value={newTask?.assignee}
               onValueChange={(value) =>
                 setNewTask({ ...newTask, assignee: value as TaskStatus })
               }
@@ -234,27 +176,11 @@ const AddTaskModal = () => {
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="dueDate" className="text-left">
-              Due Date
-            </Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={
-                newTask.dueDate ? format(newTask.dueDate, "yyyy-MM-dd") : ""
-              }
-              onChange={(e) =>
-                setNewTask({...newTask,dueDate: e.target.value? new Date(e.target.value): undefined,})
-              }
-              className="col-span-3 w-fit"
-            />
-          </div> */}
         </div>
-        {/* {newTask._id ? "Save Changes" : "Add Task"} */}
+       
         <DialogFooter>
           <Button type="submit" onClick={handleAddTask}>
-            {"Add Task"}
+             {newTask?.id ? "Save" : "Add Task"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,41 +1,41 @@
 "use client";
 
-
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useModalStore } from "@/store/modalStore";
 import { useTaskStore } from "@/store/taskStore";
-import {Dialog,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { supabase } from "@/lib/supabaseClient";
 
 const DeleteModal = () => {
-
-  const {toast} = useToast();
-  const {setTaskToDelete,taskToDelete,deleteTask} = useTaskStore();
-  const {setIsDeleteModalOpen,isDeleteModalOpen,} = useModalStore();
+  const { toast } = useToast();
+  const { taskToDelete, deleteTask } = useTaskStore();
+  const { setIsDeleteModalOpen, isDeleteModalOpen } = useModalStore();
 
   const handleCloseDeleteModal = () => {
-    setTaskToDelete("");
     setIsDeleteModalOpen(false);
   };
 
-  const handleDeleteTask = async() => {
+  const handleDeleteTask = async () => {
     if (taskToDelete) {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/deletetask`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ _id: taskToDelete }),
-      });
-      const data = await res.json();
+      const { data, error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskToDelete);
 
       deleteTask(taskToDelete);
       toast({
         title: "Task Deleted",
         variant: "destructive",
         duration: 2000,
-      })
-      setTaskToDelete("");
+      });
       setIsDeleteModalOpen(false);
     }
   };
@@ -44,10 +44,9 @@ const DeleteModal = () => {
     <Dialog open={isDeleteModalOpen} onOpenChange={handleCloseDeleteModal}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogTitle>Delete Confirmation</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this task? This action cannot be
-            undone.
+            Are you want to delete this task?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

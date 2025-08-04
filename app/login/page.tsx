@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -10,11 +9,10 @@ import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboardStore";
 import { supabase } from "@/lib/supabaseClient";
 
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,13 +30,12 @@ function Page() {
   };
 
   useEffect(() => {
-    console.log("supabase instance:", supabase.auth); // Should be an object
     const checkConnection = async () => {
       const { error } = await supabase.auth.getSession();
       if (error) {
-        console.error("❌ Supabase not connected:", error.message);
+        console.error("Supabase not connected:", error.message);
       } else {
-        console.log("✅ Supabase connection is working");
+        console.log("Supabase connection is working");
       }
     };
 
@@ -54,27 +51,12 @@ function Page() {
     e.preventDefault();
     setLoading(true);
 
-    //  router.push("/");
-    // return
     try {
-      // const url = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`;
-      // const res = await fetch(url, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(loginInfo),
-      // });
-
-      // const result = await res.json();
-      // const { success, message, jwtToken, email, name } = result;
-
       const {
         data: { user, session },
         error,
       } = await supabase.auth.signInWithPassword(loginInfo);
-      console.log("Data :::", user);
-
+    
       if (user) {
         toast({
           title: "Login Successful",
@@ -103,7 +85,6 @@ function Page() {
       } else {
         toast({
           title: "Error",
-          // description: message,
           variant: "default",
           className: "bg-red-400 text-black",
           duration: 2000,
@@ -132,7 +113,7 @@ function Page() {
     );
   }, []);
 
-  // Redirecting the user to the dashboard if they are already logged in
+
   useEffect(() => {
     if (user) {
       router.push("/");
@@ -144,25 +125,18 @@ function Page() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center ">
-            Login Your Account
+            Login
           </CardTitle>
-          <CardDescription className="text-center ">
-            Task Management Dashboard
-          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <div className="text-center">
-            <p>Demo User email = test@gmail.com</p>
-            <p>Demo User password = 123456</p>
-          </div>
           <form className="space-y-4" onSubmit={submitForm}>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Please Enter your email"
                 name="email"
                 onChange={handleChange}
                 required
@@ -173,7 +147,7 @@ function Page() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Please Enter your password"
                 name="password"
                 autoComplete="on"
                 onChange={handleChange}
@@ -185,18 +159,10 @@ function Page() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out"
             >
-              Sign Inb
+              Sign In
             </Button>
           </form>
 
-          <div className="pt-4">
-            <p className="text-center">
-              Don't have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline">
-                Sign Up
-              </Link>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

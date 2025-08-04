@@ -1,6 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import EditDeleteMenu from "./EditDeleteMenu";
@@ -31,31 +30,22 @@ import TaskDetails from "./TaskDetails";
 
 const Tasklist = () => {
   const { toast } = useToast();
-  const { tasks, updateTask } = useTaskStore();
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { tasks } = useTaskStore();
+  const [sortOrder] = useState<"asc" | "desc">("asc");
   const [statusFilter, setStatusFilter] = useState<TaskStatus | "all">("all");
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | "all">(
     "all"
   );
-  const [sortBy, setSortBy] = useState<
-    "title" | "priority" | "dueDate" | "none"
-  >("none");
+  const [sortBy, setSortBy] = useState<"title" | "priority" | "none">("none");
   const router = useRouter();
   const { boardView, setBoardView } = useDashboardStore();
   const [taskDetails, setTaskDetails] = useState<Task[]>([]);
 
-   const taskss = [
-    { id: 1, name: 'Design homepage', description: '...', status: 'In Progress', assignee: 'Alice' },
-    { id: 2, name: 'Set up DB', description: '...', status: 'Pending', assignee: 'Bob' }
-  ];
-
-  useEffect(() => {
-    console.log("Taks List", tasks);
-  }, []);
   const filteredTasks = tasks.filter(
     (task) =>
-      // (statusFilter === "all" || task.status === statusFilter) &&
-      priorityFilter === "all" || task.priority === priorityFilter
+      ((statusFilter === "all" || task.status === statusFilter) &&
+        priorityFilter === "all") ||
+      task.priority === priorityFilter
   );
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -70,28 +60,12 @@ const Tasklist = () => {
         ? priorityOrder[a.priority] - priorityOrder[b.priority]
         : priorityOrder[b.priority] - priorityOrder[a.priority];
     }
-
-    // if (sortBy === "dueDate") {
-    //   if (!a.dueDate) return sortOrder === "asc" ? 1 : -1;
-    //   if (!b.dueDate) return sortOrder === "asc" ? -1 : 1;
-
-    //   return sortOrder === "asc"
-    //     ? a.dueDate.getTime() - b.dueDate.getTime()
-    //     : b.dueDate.getTime() - a.dueDate.getTime();
-    // }
-
     return 0;
   });
 
   function handleTask(task: any) {
-    console.log("Task data", task);
-    // const obj = {
-    //   name: "ahbdhawbdh",
-    // };
     setTaskDetails(task);
-
     setBoardView("task-detail");
-    console.log("AAAAAAAAA", taskDetails);
   }
 
   return (
@@ -99,7 +73,7 @@ const Tasklist = () => {
       {boardView !== "task-detail" ? (
         <>
           {/* Filters  */}
-          <div className="mb-4 flex flex-wrap gap-4 justify-start">
+          <div className="mb-4 flex flex-wrap gap-4 justify-start  cursor-pointer">
             <Select
               value={statusFilter}
               onValueChange={(value) =>
@@ -135,7 +109,7 @@ const Tasklist = () => {
             <Select
               value={sortBy}
               onValueChange={(value) =>
-                setSortBy(value as "title" | "priority" | "dueDate" | "none")
+                setSortBy(value as "title" | "priority" | "none")
               }
             >
               <SelectTrigger className="w-fit px-4 bg-background dark:bg-secondary ">
@@ -145,23 +119,12 @@ const Tasklist = () => {
                 <SelectItem value="none">No Sorting</SelectItem>
                 <SelectItem value="title">Title</SelectItem>
                 <SelectItem value="priority">Priority</SelectItem>
-                <SelectItem value="dueDate">Due Date</SelectItem>
               </SelectContent>
             </Select>
-            {sortBy !== "none" && (
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
-              >
-                {sortOrder === "asc" ? "Ascending" : "Descending"}
-              </Button>
-            )}
           </div>
 
           {/* Tasks */}
-          <div className="  py-4 space-y-2">
+          <div className="  py-4 space-y-2 cursor-pointer">
             {sortedTasks.length == 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 mt-6">
                 No tasks found
@@ -172,11 +135,10 @@ const Tasklist = () => {
                   <TableRow>
                     <TableHead>Tasks</TableHead>
                     <TableHead>Description</TableHead>
-                    {/* <TableHead className="text-nowrap">Due Date</TableHead> */}
                     <TableHead>Priority</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Assignee</TableHead>
-                    <TableHead className="text-right">Menu</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -188,20 +150,12 @@ const Tasklist = () => {
                     >
                       <TableCell className="space-y-2  text-nowrap w-1/2 capitalize">
                         <div>
-                          <h3 className="font-semibold text-base   ">
+                          <h3 className="font-semibold text-base">
                             {task?.title}
                           </h3>
-                          {/* {task.description && (
-                        <p className="text-xs md:text-s text-gray-500 dark:text-gray-400 mt-1">
-                          {task.description}
-                        </p>
-                      )} */}
                         </div>
                       </TableCell>
                       <TableCell className="text-nowrap ">
-                        {/* {task.dueDate
-                      ? format(task.dueDate, "MMM d, yyyy")
-                      : "No Due Date"} */}
                         {task?.description && <p>{task?.description}</p>}
                       </TableCell>
                       <TableCell className="text-nowrap">
@@ -215,46 +169,7 @@ const Tasklist = () => {
                       <TableCell className="text-nowrap">
                         {task.assignee}
                       </TableCell>
-                      {/* <TableCell className="text-nowrap  ">
-                    <Select
-                      // value={task.status}
-                      onValueChange={async (value) => {
-                        const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/updatetask`;
-                        const headers = {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({ ...task, status: value }),
-                        };
-                        const res = await fetch(url, headers);
-                        const data = await res.json();
-
-                        // updateTask({ ...task, status: value as TaskStatus });
-                        toast({
-                          title: "Task Updated",
-                          variant: "default",
-                          className: "bg-green-400 text-black",
-                          duration: 2000,
-                        });
-                      }}
-                    >
-                      <SelectTrigger className={` bg-background } `}>
-                        <SelectValue placeholder={"Status"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Status</SelectLabel>
-                          <SelectItem value="To Do">To Do</SelectItem>
-                          <SelectItem value="In Progress">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </TableCell> */}
-
+                     
                       <TableCell className="text-right ">
                         <EditDeleteMenu task={task} />
                       </TableCell>
@@ -263,8 +178,8 @@ const Tasklist = () => {
                 </TableBody>
                 <TableFooter>
                   <TableRow>
-                    <TableCell className="text-left text-sm" colSpan={5}>
-                      Total Tasks : {sortedTasks.length}
+                    <TableCell className="text-left text-md" colSpan={5}>
+                      Total : {sortedTasks.length}
                     </TableCell>
                   </TableRow>
                 </TableFooter>

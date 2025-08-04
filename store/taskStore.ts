@@ -6,14 +6,14 @@ import { create } from "zustand";
 export type State = {
   tasks: Task[];
   newTask: Task;
-  taskToDelete: string;
+  taskToDelete: any;
 };
 
 export type Actions = {
   setNewTask: (task: Task) => void;
-  setTaskToDelete: (_id: string) => void;
+  setTaskToDelete: (id: number) => void;
   addTask: (task: Task) => void;
-  deleteTask: (id: string) => void;
+  deleteTask: (id: any) => void;
   updateTask: (task: Task) => void;
   setTasks: (tasks: Task[]) => void;
 };
@@ -23,12 +23,12 @@ export const useTaskStore = create<State & Actions>((set) => ({
   taskToDelete: "",
   setTasks: (tasks: Task[]) => set({ tasks }),
   setNewTask: (task: Task) => set({ newTask: task }),
-  setTaskToDelete: (_id: string) => set({ taskToDelete: _id }),
+  setTaskToDelete: (id: any) => set({ taskToDelete: id }),
   addTask: (task: Task) => {
     set((state) => ({ tasks: [...state.tasks, { ...task }] }));
   },
-  deleteTask: (_id: string) =>
-    set((state) => ({ tasks: state.tasks.filter((task) => task.id !== _id) })),
+  deleteTask: (id: string) =>
+    set((state) => ({ tasks: state.tasks.filter((task) => task.id !== id) })),
   updateTask: (task: Task) => {
     set((state) => ({
       tasks: state.tasks.map((t) => (t.id === task.id ? task : t)),
