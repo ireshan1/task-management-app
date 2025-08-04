@@ -56,9 +56,7 @@ const AddTaskModal = () => {
       newTask.title != ""
     ) {
       const userStr = localStorage.getItem("user"); // get current user string from localStorage
-      const userObj = userStr ? JSON.parse(userStr) : null; // parse to object
-
-    
+      const userObj = userStr ? JSON.parse(userStr) : null;
 
       if (newTask?.user_id) {
         const { data, error } = await supabase
@@ -70,10 +68,10 @@ const AddTaskModal = () => {
                 newTask.assignee != null ? newTask.assignee : userObj?.user_id,
             },
           ])
-          .eq("id", newTask?.id).select()
+          .eq("id", newTask?.id)
+          .select();
 
-
-          console.log("Task updated",data)
+        console.log("Task updated", data);
         if (!error) {
           toast({
             title: "Task has been updated",
@@ -81,19 +79,15 @@ const AddTaskModal = () => {
             className: "bg-green-400 text-black",
             duration: 2000,
           });
-        
-            // Assuming the last inserted task is the one just added
-            console.log("Taks updated");
-            if (data && data.length > 0) {
-            // Assuming the last inserted task is the one just added
-            console.log("Taks added");
-            updateTask(data[data.length - 1]);
-          }
-        
+
+          console.log("Taks updated");
           
-          setIsAddModalOpen(false);
+          if (data && data.length > 0) {
+            updateTask(data[data.length - 1]);
+            setIsAddModalOpen(false);
+            setNewTask(EmptyTask);
+          }
         }
-        setNewTask(EmptyTask);
       } else {
         delete newTask.id;
         const { data, error } = await supabase
@@ -115,16 +109,14 @@ const AddTaskModal = () => {
             duration: 2000,
           });
 
-          // const typedData = data as Task[] | null;
           if (data && data.length > 0) {
             // Assuming the last inserted task is the one just added
             console.log("Taks added");
             addTask(data[data.length - 1]);
+            setIsAddModalOpen(false);
+            setNewTask(EmptyTask);
           }
-          
-          setIsAddModalOpen(false);
         }
-        setNewTask(EmptyTask);
       }
     } else {
       toast({
@@ -219,7 +211,13 @@ const AddTaskModal = () => {
               Assignee
             </Label>
             <Select
-              value={newTask.id != '' || newTask.id != undefined || newTask.id != null ? newTask?.assignee : newTask?.id}
+              value={
+                newTask.id != "" ||
+                newTask.id != undefined ||
+                newTask.id != null
+                  ? newTask?.assignee
+                  : newTask?.id
+              }
               onValueChange={(value) =>
                 setNewTask({ ...newTask, assignee: value as TaskStatus })
               }

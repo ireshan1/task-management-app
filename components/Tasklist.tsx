@@ -170,7 +170,7 @@ const Tasklist = () => {
                         {task.assignee}
                       </TableCell>
                      
-                      <TableCell className="text-right ">
+                      <TableCell className="text-right" onClick={(e)=> e.stopPropagation()}>
                         <EditDeleteMenu task={task} />
                       </TableCell>
                     </TableRow>
